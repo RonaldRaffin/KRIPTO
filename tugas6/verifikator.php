@@ -1,36 +1,116 @@
 <?php
+// Sembunyikan warning PHP agar layout tidak rusak
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+
 function generate_rsa_keys() {
     $opensslConfig = 'D:/laragon/bin/php/php-8.2.30-Win32-vs16-x64/extras/ssl/openssl.cnf';
+
     $config = [
         "digest_alg"       => "sha256",
         "private_key_bits" => 2048,
         "private_key_type" => OPENSSL_KEYTYPE_RSA,
         "config"           => $opensslConfig,
     ];
+
     $res = openssl_pkey_new($config);
+
     if (!$res) {
         $errors = [];
-        while ($msg = openssl_error_string()) $errors[] = $msg;
+        while ($msg = openssl_error_string()) {
+            $errors[] = $msg;
+        }
         return ['error' => 'Gagal generate: ' . implode(', ', $errors)];
     }
-    openssl_pkey_export($res, $private_key, null, $config);
+
+    // Export private key
+    if (!openssl_pkey_export($res, $private_key, null, $config)) {
+        return ['error' => 'Gagal export private key.'];
+    }
+
+    // Ambil public key
     $key_details = openssl_pkey_get_details($res);
-    return ['public' => $key_details["key"], 'private' => $private_key];
+
+    if (!$key_details || !isset($key_details['key'])) {
+        return ['error' => 'Gagal mengambil public key.'];
+    }
+
+    return [
+        'public'  => $key_details['key'],
+        'private' => $private_key
+    ];
 }
 
-function sign_document($data, $private_key) {
+function sign_document($data, $private_key_pem) {
+    // Bersihkan spasi di awal/akhir
+    $private_key_pem = trim($private_key_pem);
+
+    // Konversi PEM string menjadi OpenSSL key object
+    $private_key = openssl_pkey_get_private($private_key_pem);
+
+    // Jika private key tidak valid
+    if (!$private_key) {
+        return false;
+    }
+
     $signature = '';
-    $success = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
+
+    // Proses signing
+    $success = openssl_sign(
+        $data,
+        $signature,
+        $private_key,
+        OPENSSL_ALGO_SHA256
+    );
+
+    // Bebaskan resource
+    if (function_exists('openssl_free_key')) {
+        openssl_free_key($private_key);
+    }
+
+    // Return signature dalam Base64
     return $success ? base64_encode($signature) : false;
 }
 
 function verify_document($dokumen, $signature_b64, $public_key_string) {
+    // Bersihkan spasi
+    $public_key_string = trim($public_key_string);
+    $signature_b64 = trim($signature_b64);
+
+    // Ambil public key
     $public_key = openssl_pkey_get_public($public_key_string);
-    if (!$public_key) return "ERROR: Public Key tidak valid.";
+
+    if (!$public_key) {
+        return "ERROR: Public Key tidak valid.";
+    }
+
+    // Decode signature Base64
     $signature_biner = base64_decode($signature_b64, true);
-    if (!$signature_biner) return "ERROR: Format Signature bukan Base64.";
-    $status = openssl_verify($dokumen, $signature_biner, $public_key, OPENSSL_ALGO_SHA256);
-    return ($status === 1) ? "VERIFIED" : "INVALID";
+
+    if ($signature_biner === false) {
+        return "ERROR: Format Signature bukan Base64.";
+    }
+
+    // Verifikasi signature
+    $status = openssl_verify(
+        $dokumen,
+        $signature_biner,
+        $public_key,
+        OPENSSL_ALGO_SHA256
+    );
+
+    // Bebaskan resource
+    if (function_exists('openssl_free_key')) {
+        openssl_free_key($public_key);
+    }
+
+    if ($status === 1) {
+        return "VERIFIED";
+    } elseif ($status === 0) {
+        return "INVALID";
+    } else {
+        return "ERROR: Terjadi kesalahan saat verifikasi.";
+    }
 }
 
 $hasil = "";
@@ -41,20 +121,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $dok   = $_POST['dokumen']   ?? '';
     $sign  = $_POST['signature'] ?? '';
     $kunci = $_POST['kunci']     ?? '';
+
     switch ($aksi) {
         case 'generate':
+            // Generate boleh langsung diproses
             $keys = generate_rsa_keys();
-            if (isset($keys['error'])) { $hasil = $keys['error']; $hasil_type = "error"; }
-            else { $hasil = "--- PRIVATE KEY ---\n" . $keys['private'] . "\n--- PUBLIC KEY ---\n" . $keys['public']; $hasil_type = "generate"; }
+
+            if (isset($keys['error'])) {
+                $hasil = $keys['error'];
+                $hasil_type = "error";
+            } else {
+                $hasil =
+                    "--- PRIVATE KEY ---\n" .
+                    $keys['private'] .
+                    "\n--- PUBLIC KEY ---\n" .
+                    $keys['public'];
+                $hasil_type = "generate";
+            }
             break;
+
         case 'sign':
+            // Jika menu baru dibuka tanpa input, jangan proses
+            if (trim($dok) === '' || trim($kunci) === '') {
+                break;
+            }
+
             $r = sign_document($dok, $kunci);
-            $hasil = $r ? $r : "Gagal signing. Periksa Private Key.";
-            $hasil_type = $r ? "sign" : "error";
+
+            if ($r !== false) {
+                $hasil = $r;
+                $hasil_type = "sign";
+            } else {
+                $hasil = "Gagal signing. Periksa Private Key.";
+                $hasil_type = "error";
+            }
             break;
+
         case 'verify':
+            // Jika menu baru dibuka tanpa input, jangan proses
+            if (
+                trim($dok) === '' ||
+                trim($sign) === '' ||
+                trim($kunci) === ''
+            ) {
+                break;
+            }
+
             $hasil = verify_document($dok, $sign, $kunci);
-            $hasil_type = ($hasil === "VERIFIED") ? "verified" : (($hasil === "INVALID") ? "invalid" : "error");
+
+            if ($hasil === "VERIFIED") {
+                $hasil_type = "verified";
+            } elseif ($hasil === "INVALID") {
+                $hasil_type = "invalid";
+            } else {
+                $hasil_type = "error";
+            }
             break;
     }
 }

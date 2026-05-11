@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>/KRIPTOGRAFI</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e10;
+      --text-primary: #e2e2e6;
+      --text-secondary: #888892;
+      --text-muted: #44444e;
+      --border: rgba(255, 255, 255, 0.07);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 5vh 2rem;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .kode {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .tagline {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 3.5rem;
+    }
+
+    .section { margin-bottom: 2.5rem; }
+
+    .sec-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2px;
+    }
+
+    .sec-label {
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    .sec-line {
+      flex: 1;
+      height: 0.5px;
+      background: var(--border);
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 0;
+      border-bottom: 0.5px solid var(--border);
+      text-decoration: none;
+      transition: padding-left 0.15s ease;
+    }
+
+    .row:last-child { border-bottom: none; }
+    .row:hover { padding-left: 8px; }
+
+    .row-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .row-name {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .row-path {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .row-arrow {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .footer {
+      margin-top: 3.5rem;
+      padding-top: 1.5rem;
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-host {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .footer-count {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <p class="kode">/KRIPTOGRAFI</p>
+    <h1>Kriptografi</h1>
+    <p class="tagline">Materi dan tugas kuliah</p>
+
+    <div class="section">
+      <div class="sec-head">
+        <span class="sec-label">PERTEMUAN</span>
+        <div class="sec-line"></div>
+      </div>
+      <a href="pertemuan2/" class="row">
+        <div class="row-left">
+          <span class="row-name">Pertemuan 2</span>
+          <span class="row-path">pertemuan2/</span>
+        </div>
+        <span class="row-arrow">→</span>
+      </a>
+      <a href="pertemuan3/" class="row">
+        <div class="row-left">
+          <span class="row-name">Pertemuan 3</span>
+          <span class="row-path">pertemuan3/</span>
+        </div>
+        <span class="row-arrow">→</span>
+      </a>
+    </div>
+
+    <div class="section">
+      <div class="sec-head">
+        <span class="sec-label">TUGAS</span>
+        <div class="sec-line"></div>
+      </div>
+      <a href="tugas/" class="row">
+        <div class="row-left">
+          <span class="row-name">Tugas</span>
+          <span class="row-path">tugas/</span>
+        </div>
+        <span class="row-arrow">→</span>
+      </a>
+      <a href="tugas5/" class="row">
+        <div class="row-left">
+          <span class="row-name">Tugas 5</span>
+          <span class="row-path">tugas5/</span>
+        </div>
+        <span class="row-arrow">→</span>
+      </a>
+      <a href="tugas6/" class="row">
+        <div class="row-left">
+          <span class="row-name">Tugas 6</span>
+          <span class="row-path">tugas6/</span>
+        </div>
+        <span class="row-arrow">→</span>
+      </a>
+    </div>
+
+    <div class="footer">
+      <span class="footer-host">localhost:8080</span>
+      <span class="footer-count">5 items</span>
+    </div>
+  </div>
+</body>
+</html>
