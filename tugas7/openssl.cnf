@@ -1,0 +1,37 @@
+[ req ]
+default_bits        = 2048
+default_keyfile     = privkey.pem
+distinguished_name  = req_distinguished_name
+attributes          = req_attributes
+x509_extensions     = v3_ca
+string_mask         = utf8only
+prompt              = no
+
+[ req_distinguished_name ]
+countryName                     = Country Name (2 letter code)
+countryName_default             = ID
+countryName_min                 = 2
+countryName_max                 = 2
+
+stateOrProvinceName             = State or Province Name (full name)
+stateOrProvinceName_default     = Kalimantan Barat
+
+localityName                    = Locality Name (eg, city)
+localityName_default            = Pontianak
+
+0.organizationName              = Organization Name (eg, company)
+0.organizationName_default      = UM Pontianak
+
+commonName                      = Common Name (e.g. server FQDN)
+commonName_max                  = 64
+
+[ req_attributes ]
+challengePassword               = A challenge password
+challengePassword_min           = 4
+challengePassword_max           = 20
+
+[ v3_ca ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints       = critical,CA:TRUE
+keyUsage               = critical,digitalSignature,keyCertSign,cRLSign
